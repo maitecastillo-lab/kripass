@@ -29,4 +29,4 @@ resuel 3 problemas que la mayoria tenemos.
     . Generador de Contraseñas: Botón para crear automáticamente claves de alta seguridad.
 
 - Mejoras Futuras:
-    . Acceso de doble Factor: implementar un PIN de seguridad adicional para desbloquear cada contraseña especifica..
+    . Acceso de doble Factor: implementar un PIN de seguridad adicional para desbloquear cada contraseña especifica.
