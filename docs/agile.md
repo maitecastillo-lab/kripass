@@ -9,7 +9,7 @@ Su objetivo principal: Es entregar valor al cliente de forma contante y rapido s
 - Calidad sostenida: mantener un ritmo de trabajo q permita al equipo entregar software que funcione correctamente y sea fácil de mantener a largo plazo.
 
 SCRUM
-- Es el framework más utilizado para implementar la mentalidad Agil, este es como el manual que define como se organiza el equipo, las reuniones y las entregas para que el trabajo realmante avance.
+- Es el framework más utilizado para implementar la mentalidad Agil, este es como el manual que define como se organiza el equipo, las reuniones y las entregas para que el trabajo realmante avance..
 
 1- El Sprint: es un ciclo de trabajo, o sea, hay un tiempo de una o dos semanas, en este tiempo el equipo se enfoca en completar un conjunto especifico de tareas para generar un incremento del producto que sea funcional, al terminarlo comienza la siguiente fase.
 
