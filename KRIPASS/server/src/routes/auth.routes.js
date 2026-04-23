@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
-const User = require('../models/user');
+const User = require('../models/User');
 
 // Hash simple con SHA-256 (para un proyecto académico es suficiente)
 const hashPassword = (password) => {
