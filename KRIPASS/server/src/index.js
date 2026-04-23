@@ -1,50 +1,22 @@
+require('dotenv').config();
 
-// Registro de Usuarios PERMANENTE
-app.post('/api/v1/register', (req, res) => {
-    const { usuario, password } = req.body;
+const express = require('express');
+const cors = require('cors');
 
-    if (!usuario || !password) {
-        return res.status(400).json({ error: 'Usuario y contraseña son obligatorios' });
-    }
+const passwordRoutes = require('./routes/password.routes');
+const authRoutes = require('./routes/auth.routes');
 
-    const usuarios = leerUsuarios();
-    const existe = usuarios.find(u => u.usuario.toLowerCase() === usuario.toLowerCase());
-    
-    if (existe) {
-        return res.status(400).json({ error: 'Ese nombre de usuario ya está registrado' });
-    }
+const app = express();
 
-    // Guardamos en el archivo
-    usuarios.push({ usuario, password });
-    guardarUsuarios(usuarios);
-    
-    console.log(`👤 Nuevo usuario guardado en disco: ${usuario}`);
-    res.status(201).json({ message: 'Usuario creado con éxito', usuario });
-});
+// Middlewares globales
+app.use(cors());
+app.use(express.json());
 
-// Ruta de Login PERMANENTE
-app.post('/api/v1/login', (req, res) => {
-    const { usuario, password } = req.body;
-    const usuarios = leerUsuarios(); // Buscamos en el archivo
-    
-    const user = usuarios.find(u => u.usuario === usuario && u.password === password);
-
-    if (!user) {
-        return res.status(401).json({ error: 'Credenciales inválidas' });
-    }
-
-    res.json({ message: 'Login correcto', usuario: user.usuario });
-});
-
+// Rutas
 app.use('/api/v1/passwords', passwordRoutes);
+app.use('/api/v1', authRoutes);
 
-// Servidor
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`Servidor listo en: http://localhost:${PORT}`);
-});
-
-// Manejo de errores
-app.use((err, req, res, next) => {
-    console.error('ERROR DETECTADO:', err.message);
-    res.status(500).json({ error: 'Error interno del servidor' });
+  console.log(`KRIPASS corriendo en http://localhost:${PORT}`);
 });

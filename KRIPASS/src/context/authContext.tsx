@@ -1,6 +1,5 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
-//Definimos qué datos habrá en la "nube" global
 interface AuthContextType {
   usuario: string | null;
   estaAutenticado: boolean;
@@ -8,13 +7,26 @@ interface AuthContextType {
   logout: () => void;
 }
 
-//Creamos el Contexto
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const STORAGE_KEY = 'kripass_user';
 
-//El Provider: El componente que envuelve a la App y reparte los datos
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [usuario, setUsuario] = useState<string | null>(null);
-  const [estaAutenticado, setEstaAutenticado] = useState(false);
+  // Al arrancar, leemos de localStorage para mantener la sesión
+  const [usuario, setUsuario] = useState<string | null>(() => {
+    return localStorage.getItem(STORAGE_KEY);
+  });
+  const [estaAutenticado, setEstaAutenticado] = useState<boolean>(() => {
+    return !!localStorage.getItem(STORAGE_KEY);
+  });
+
+  // Sincronizamos localStorage cada vez que cambia el usuario
+  useEffect(() => {
+    if (usuario) {
+      localStorage.setItem(STORAGE_KEY, usuario);
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [usuario]);
 
   const login = (nombre: string) => {
     setUsuario(nombre);
@@ -33,9 +45,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-//Hook para consumir el contexto fácilmente
 export const useAuthContext = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuthContext debe usarse dentro de AuthProvider");
+  if (!context) throw new Error('useAuthContext debe usarse dentro de AuthProvider');
   return context;
 };
