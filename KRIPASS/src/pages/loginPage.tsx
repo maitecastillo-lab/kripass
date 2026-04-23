@@ -41,7 +41,7 @@ export const LoginPage = () => {
     }
 
     const endpoint = esRegistro ? '/register' : '/login';
-    const url = `http://localhost:4000/api/v1${endpoint}`;
+    const url = `${import.meta.env.VITE_API_URL}${endpoint}`;
 
     try {
       const respuesta = await fetch(url, {

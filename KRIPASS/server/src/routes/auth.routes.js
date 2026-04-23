@@ -1,22 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
-
-const USERS_PATH = path.join(__dirname, '../../users.json');
-
-const readUsers = () => {
-  if (!fs.existsSync(USERS_PATH)) {
-    fs.writeFileSync(USERS_PATH, JSON.stringify([]));
-    return [];
-  }
-  return JSON.parse(fs.readFileSync(USERS_PATH, 'utf-8'));
-};
-
-const writeUsers = (data) => {
-  fs.writeFileSync(USERS_PATH, JSON.stringify(data, null, 2));
-};
+const User = require('../models/user');
 
 // Hash simple con SHA-256 (para un proyecto académico es suficiente)
 const hashPassword = (password) => {
@@ -24,47 +9,55 @@ const hashPassword = (password) => {
 };
 
 // REGISTRO
-router.post('/register', (req, res) => {
-  const { usuario, password } = req.body;
+router.post('/register', async (req, res) => {
+  try {
+    const { usuario, password } = req.body;
 
-  if (!usuario || !password) {
-    return res.status(400).json({ error: 'Usuario y contraseña son obligatorios' });
+    if (!usuario || !password) {
+      return res.status(400).json({ error: 'Usuario y contraseña son obligatorios' });
+    }
+
+    const existe = await User.findOne({ usuario });
+    if (existe) {
+      return res.status(409).json({ error: 'El usuario ya existe' });
+    }
+
+    const nuevoUsuario = new User({
+      usuario,
+      password: hashPassword(password)
+    });
+
+    await nuevoUsuario.save();
+    res.status(201).json({ message: 'Usuario creado con éxito', usuario });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error en el servidor' });
   }
-
-  const users = readUsers();
-
-  if (users.find(u => u.usuario === usuario)) {
-    return res.status(409).json({ error: 'El usuario ya existe' });
-  }
-
-  users.push({
-    usuario,
-    password: hashPassword(password),
-    createdAt: new Date().toISOString()
-  });
-
-  writeUsers(users);
-
-  res.status(201).json({ message: 'Usuario creado con éxito', usuario });
 });
 
 // LOGIN
-router.post('/login', (req, res) => {
-  const { usuario, password } = req.body;
+router.post('/login', async (req, res) => {
+  try {
+    const { usuario, password } = req.body;
 
-  if (!usuario || !password) {
-    return res.status(400).json({ error: 'Faltan credenciales' });
+    if (!usuario || !password) {
+      return res.status(400).json({ error: 'Faltan credenciales' });
+    }
+
+    const encontrado = await User.findOne({
+      usuario,
+      password: hashPassword(password)
+    });
+
+    if (!encontrado) {
+      return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+    }
+
+    res.status(200).json({ message: 'Login exitoso', usuario });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error en el servidor' });
   }
-
-  const users = readUsers();
-  const hashInput = hashPassword(password);
-  const encontrado = users.find(u => u.usuario === usuario && u.password === hashInput);
-
-  if (!encontrado) {
-    return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
-  }
-
-  res.status(200).json({ message: 'Login exitoso', usuario });
 });
 
 module.exports = router;

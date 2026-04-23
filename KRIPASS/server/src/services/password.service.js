@@ -1,49 +1,21 @@
-const fs = require('fs');
-const path = require('path');
+const Password = require('../models/Password');
 
-// Definimos la ruta del archivo (se creará en la raíz del server)
-const FILE_PATH = path.join(__dirname, '../../db.json');
-
-// Función auxiliar para leer el archivo de forma segura
-const readData = () => {
-  try {
-    if (!fs.existsSync(FILE_PATH)) {
-      fs.writeFileSync(FILE_PATH, JSON.stringify([])); // Si no existe, lo crea vacío
-      return [];
-    }
-    const data = fs.readFileSync(FILE_PATH, 'utf-8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error("Error leyendo la base de datos:", error);
-    return [];
-  }
+const getAll = async () => {
+  return await Password.find();
 };
 
-// Función auxiliar para escribir en el archivo
-const writeData = (data) => {
-  fs.writeFileSync(FILE_PATH, JSON.stringify(data, null, 2));
+const create = async (newPassword) => {
+  const item = new Password(newPassword);
+  return await item.save();
 };
 
-const getAll = () => {
-  return readData();
+const update = async (id, newData) => {
+  return await Password.findByIdAndUpdate(id, newData, { new: true });
 };
 
-const create = (newPassword) => {
-  const passwords = readData();
-  const item = {
-    id: Date.now(),
-    ...newPassword
-  };
-  passwords.push(item);
-  writeData(passwords); // Guardamos en el archivo físico
-  return item;
+const remove = async (id) => {
+  const result = await Password.findByIdAndDelete(id);
+  return !!result; // true si encontró y borró, false si no
 };
 
-const remove = (id) => {
-  let passwords = readData();
-  passwords = passwords.filter(p => p.id !== parseInt(id));
-  writeData(passwords); // Actualizamos el archivo tras borrar
-  return true;
-};
-
-module.exports = { getAll, create, remove };
+module.exports = { getAll, create, update, remove };
