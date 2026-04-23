@@ -1,8 +1,29 @@
 {
+  "name": "kripass-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
-    "axios": "^1.15.2"
+    "@tailwindcss/vite": "^4.2.2",
+    "axios": "^1.15.2",
+    "cors": "^2.8.6",
+    "lucide-react": "^1.8.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.1.5",
+    "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
-    "@types/axios": "^0.9.36"
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.0"
   }
 }
