@@ -47,3 +47,57 @@ Documentación de decisiones de arquitectura:
         - el backend envia el texto cifrado que tiene guardado.
         - el frontend recibe ese codigo pero no lo enseña hasta que pongas la llave de acceso.
         - una vez que pones la llave, el fronted traduce el codigo y te muestra la contraseña en pantalla.
+
+Capa de red (frontend)
+
+Toda la comunicación con el backend pasa por un único archivo `src/api/client.ts`. Uso **axios** porque es más cómodo que fetch y maneja los errores de forma más clara. La URL base se lee de una variable de entorno (`VITE_API_URL`), así en desarrollo apunta a `localhost:4000` y en producción a Render, sin cambiar código.
+
+Cliente:
+
+```typescript
+const instance = axios.create({
+  baseURL: API_URL,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+export const passwordClient = {
+  getAll: () => instance.get('/'),
+  create: (data: PasswordAccount) => instance.post('/', data),
+  update: (id, data) => instance.put(`/${id}`, data),
+  delete: (id) => instance.delete(`/${id}`),
+};
+```
+
+Contrato de tipos
+
+El tipo `PasswordAccount` está definido en el cliente y coincide con el modelo de Mongoose del backend. Si cambio un campo en el backend, lo cambio también aquí. Este es el "contrato":
+
+```typescript
+interface PasswordAccount {
+  id?: number | string;
+  site: string;
+  username: string;
+  password?: string;
+  category: string;
+}
+```
+
+## Estados de red en la UI
+
+En la UI gestiono los 3 estados de cualquier petición:
+
+- Loading:muestro un spinner (`Loader2` de lucide) mientras se cargan los datos.
+- Success: cuando llegan los datos, los renderizo en pantalla.
+- Error: si el servidor falla, muestro un mensaje con un botón "Reintentar conexión".
+
+Ejemplo en `FolderDetail`:
+
+```tsx
+if (cargando) return ;
+if (error) return ;
+return ;
+```
+
+Los datos que viven en el backend (contraseñas y carpetas) NO los guardo en localStorage. El backend es la única fuente de verdad: cada vez que entro al dashboard o a una carpeta, pido los datos frescos al servidor.
+
+Lo único que guardo en localStorage es el nombre del usuario logueado, para que la sesión se mantenga al recargar F5.
